@@ -15,16 +15,15 @@ Needs to have (minimum viable product):
 - Cars move tile-by-tile along roads
 4. Pathfinding Algorithm
 - Cars find a valid route from house to destination (BFS or similar)
-5. Multiple Houses and Destinations
-- At least 2-3 sets with matching colors
-6. Traffic System 
+5. Traffic System 
 - Cars wait if blocked, creating congestion
-7. Game Over Condition
+6. Game Over Condition
 - Game ends if too many cars accumulate at a house 
-8. User Interface
+7. User Interface
 - Display score and game-over screen
 
 Nice to have:
+- Multiple Houses and Destinations At least 2-3 sets with matching colors
 - Traffic lights or Roundabouts at intersections
 - Limited number of roads
 - Mountains/Tunnels and Bridges/Rivers implemented
