@@ -22,10 +22,27 @@ let minSpawnInterval = 240;
 
 let globalTimer = 0;
 
+//----------------------SETUP----------------------
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  updateGridSize();
   initGrid();
 }
+
+function updateGridSize() {
+  cellSize = 30;
+  cols = floor(windowWidth / cellSize);
+  rows = floor(windowHeight / cellSize);
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  updateGridSize();
+  initGrid();
+}
+
+//----------------------INIT----------------------
 
 function initGrid() {
   grid = [];
@@ -47,8 +64,9 @@ function initGrid() {
     }
   }
   createPairRandom();
-  createPairRandom();
 }
+
+//----------------------DRAW----------------------
 
 function draw() {
   background(240);
@@ -67,6 +85,8 @@ function draw() {
   }
 }
 
+//----------------------GAMELOOP----------------------
+
 function updateGame() {
   globalTimer ++;
 
@@ -78,6 +98,8 @@ function updateGame() {
   updateCars();
 }
 
+//----------------------MENU----------------------
+
 function drawMenu() {
   textAlign(CENTER, CENTER);
   textSize(40);
@@ -88,4 +110,22 @@ function drawMenu() {
   text("Click to Start", width / 2, height / 2 + 20);
 }
 
+function drawGameOver() {
+  fill(0, 150);
+  rect(0, 0, width, height);
 
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textSize(40);
+  text("GAME OVER", width / 2, height / 2 - 20);
+
+  textSize(20);
+  text("Score" + score, width / 2, height / 2 + 20);
+  text("Click to Restart", width / 2, height / 2 + 60);
+}
+
+//----------------------GRID----------------------
+
+function drawGrid() {
+  
+}
