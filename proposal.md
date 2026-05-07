@@ -27,7 +27,7 @@ Nice to have:
 - Traffic lights or Roundabouts at intersections
 - Limited number of roads
 - Mountains/Tunnels and Bridges/Rivers implemented
-- Motorway/Highway the connects two things directly suspended in air
+- Motorway/Highway that connects two things directly suspended in air
 - Increasing difficulty
 - Smoother animation instead of grid-based movement
 - Multiple destinations per color

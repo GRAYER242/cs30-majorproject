@@ -22,7 +22,7 @@ let minSpawnInterval = 240;
 
 let globalTimer = 0;
 
-//----------------------SETUP----------------------
+//----------------------SETUP----------------------//
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -42,7 +42,7 @@ function windowResized() {
   initGrid();
 }
 
-//----------------------INIT----------------------
+//----------------------INIT----------------------//
 
 function initGrid() {
   grid = [];
@@ -66,7 +66,7 @@ function initGrid() {
   createPairRandom();
 }
 
-//----------------------DRAW----------------------
+//----------------------DRAW----------------------//
 
 function draw() {
   background(240);
@@ -85,7 +85,7 @@ function draw() {
   }
 }
 
-//----------------------GAMELOOP----------------------
+//----------------------GAMELOOP----------------------//
 
 function updateGame() {
   globalTimer ++;
@@ -98,7 +98,7 @@ function updateGame() {
   updateCars();
 }
 
-//----------------------MENU----------------------
+//----------------------MENU----------------------//
 
 function drawMenu() {
   textAlign(CENTER, CENTER);
@@ -124,8 +124,36 @@ function drawGameOver() {
   text("Click to Restart", width / 2, height / 2 + 60);
 }
 
-//----------------------GRID----------------------
+//----------------------GRID----------------------//
 
 function drawGrid() {
-  
+  for (let i = 0; i < cols; i++) {
+    for (let j = 0; j < rows; j ++) {
+      stroke(200);
+      fill(255);
+      rect(i * cellSize, j * cellSize, cellSize, cellSize);
+
+      if (grid[i][j].road) {
+        fill(80);
+        rect(i * cellSize, j * cellSize, cellSize, cellSize);
+      }
+
+      if (grid[i][j].house) {
+        fill(grid[i][j].house);
+        rect(i * cellSize + 15, j * cellSize + 15, 18);
+      }
+
+      if (grid[i][j].destination) {
+        fill(grid[i][j].destination);
+        rect(i * cellSize + 5, j * cellSize + 5, 20, 20);
+      }
+    }
+  }
+
+  for (let car of cars) {
+    fill(car.col);
+    ellipse(car.drawX, car.drawY, 10);
+  }
 }
+
+//----------------------INPUT----------------------//
