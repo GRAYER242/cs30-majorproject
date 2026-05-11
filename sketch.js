@@ -157,3 +157,58 @@ function drawGrid() {
 }
 
 //----------------------INPUT----------------------//
+
+function mousePressed() {
+  if (state === "menu") {
+    state = "playing";
+    return;
+  }
+
+  if (state === "gameover") {
+    initGrid();
+    state = "playing";
+    return;
+  }
+
+  if (mouseButton === LEFT) {
+    placeRoad();
+  }
+  else if (MouseButton === RIGHT) {
+    removeRoad();
+  }
+}
+
+function mouseDragged() {
+  if (state !== "playing") {
+    return;
+  }
+
+  if (mouseButton === LEFT) {
+    placeRoad();
+  }
+  else if (mouseButton === RIGHT) {
+    removeRoad();
+  }
+}
+
+function placeRoad() {
+  let i = floor(mouseX / cellSize);
+  let j = floor(mouseY / cellSize);
+
+  if (i >= 0 && j >= 0 && i < cols && j < rows) {
+    if (!grid[i][j].house && !grid[i][j].destination) {
+      grid[i][j].road = true;
+    }
+  }
+}
+
+function removeRoad() {
+  let i = floor(mouseX / cellSize);
+  let j = floor(mouseY / cellSize);
+
+  if (i >= 0 && j >= 0 && i < cols && j < rows) {
+    if (!grid[i][j].house && !grid[i][j].destination) {
+      grid[i][j].road = false;
+    }
+  }
+}
