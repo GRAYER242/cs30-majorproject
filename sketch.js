@@ -173,7 +173,7 @@ function mousePressed() {
   if (mouseButton === LEFT) {
     placeRoad();
   }
-  else if (MouseButton === RIGHT) {
+  else if (mouseButton === RIGHT) {
     removeRoad();
   }
 }
