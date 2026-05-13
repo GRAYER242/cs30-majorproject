@@ -212,3 +212,52 @@ function removeRoad() {
     }
   }
 }
+
+//----------------------HOUSES----------------------//
+
+function createPairRandom() {
+  let colors = [
+    color(255,0,0),
+    color(0,0,255),
+    color(0,200,0),
+    color(255,150,0),
+  ];
+
+  let col = random(colors);
+  let attempts = 0;
+
+  while (attempts < 250) {
+    let hx = floor(random(cols));
+    let hy = floor(random(rows));
+    let dx = floor(random(cols));
+    let dy = floor(random(rows));
+
+    let houseCell = grid[hy][hx];
+    let destCell = grid[dx][dy];
+
+    let manhattan = abs(hx - dx) + abs(hy-dy);
+    let tooClose = manhattan < 5;
+
+    let valid = !tooClose && !houseCell.house && !houseCell.destination && !houseCell.road && !destCell.house && !destCell.destination && !destCell.road;
+    
+    if (!valid) {
+      attempts ++;
+      continue;
+    }
+
+    if (!isReachable(hx, hy, dx, dy)) {
+      attempts ++;
+      continue;
+    }
+
+    houseCell.house = col;
+    houses.push({x:hx, y:hy, col, timer:0, queue: 0});
+
+    destCell.destination = col;
+    destinations.push({x:dx, y:dy, col});
+
+    return;
+  }
+}
+
+//----------------------REACHABILITY----------------------//
