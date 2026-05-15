@@ -3,7 +3,9 @@
 // 2/27/2026
 //
 // Extra for Experts:
-// - describe what you did to take this project "above and beyond"
+// - used continue
+// - used {} for empty object
+// - used null
 
 let cols = 20;
 let rows = 20;
@@ -88,7 +90,7 @@ function draw() {
 //----------------------GAMELOOP----------------------//
 
 function updateGame() {
-  globalTimer ++;
+  globalTimer++;
 
   if (globalTimer % spawnInterval === 0) {
     createPairRandom();
@@ -128,7 +130,7 @@ function drawGameOver() {
 
 function drawGrid() {
   for (let i = 0; i < cols; i++) {
-    for (let j = 0; j < rows; j ++) {
+    for (let j = 0; j < rows; j++) {
       stroke(200);
       fill(255);
       rect(i * cellSize, j * cellSize, cellSize, cellSize);
@@ -217,10 +219,10 @@ function removeRoad() {
 
 function createPairRandom() {
   let colors = [
-    color(255,0,0),
-    color(0,0,255),
-    color(0,200,0),
-    color(255,150,0),
+    color(255, 0, 0),
+    color(0, 0, 255),
+    color(0, 200, 0),
+    color(255, 150, 0),
   ];
 
   let col = random(colors);
@@ -235,26 +237,26 @@ function createPairRandom() {
     let houseCell = grid[hy][hx];
     let destCell = grid[dx][dy];
 
-    let manhattan = abs(hx - dx) + abs(hy-dy);
+    let manhattan = abs(hx - dx) + abs(hy - dy);
     let tooClose = manhattan < 5;
 
     let valid = !tooClose && !houseCell.house && !houseCell.destination && !houseCell.road && !destCell.house && !destCell.destination && !destCell.road;
-    
+
     if (!valid) {
-      attempts ++;
+      attempts++;
       continue;
     }
 
     if (!isReachable(hx, hy, dx, dy)) {
-      attempts ++;
+      attempts++;
       continue;
     }
 
     houseCell.house = col;
-    houses.push({x:hx, y:hy, col, timer:0, queue: 0});
+    houses.push({ x: hx, y: hy, col, timer: 0, queue: 0 });
 
     destCell.destination = col;
-    destinations.push({x:dx, y:dy, col});
+    destinations.push({ x: dx, y: dy, col });
 
     return;
   }
@@ -262,3 +264,42 @@ function createPairRandom() {
 
 //----------------------REACHABILITY----------------------//
 
+function isReachable(sx, sy, dx, dy) {
+  let queue = [];
+  let visited = {};
+
+  queue.push({ x: sx, y: sy });
+
+  while (queue.length > 0) {
+    let current = queue.shift();
+    let key = current.x + "," + current.y;
+    if (visited[key]) {
+      continue;
+      visited[key] = true;
+    }
+    if (current.x === dx && current.y === dy) {
+      return true;
+    }
+    let dirs = [
+      { x: 1, y: 0 },
+      { x: -1, y: 0 },
+      { x: 0, y: 1 },
+      { x: 0, y: -1 }
+    ];
+
+    for (let d of dirs) {
+      let nx = current.x + d.x;
+      let ny = current.y + d.y;
+
+      if (nx >= 0 && ny >= 0 && nx < cols && ny < rows) {
+        let next = grid[nx][ny];
+        if (!next.house && !next.destination) {
+          queue.push({ x: nx, y: ny });
+        }
+      }
+    }
+  }
+  return false;
+}
+
+//----------------------CARS----------------------//
