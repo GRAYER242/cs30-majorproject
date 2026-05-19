@@ -303,3 +303,46 @@ function isReachable(sx, sy, dx, dy) {
 }
 
 //----------------------CARS----------------------//
+
+function spawnCars() {
+  for (let h of houses) {
+    h.timer++;
+
+    if (h.timer > 180) {
+      h.timer = 0;
+      h.queue++;
+
+      if (h.queue > 6) {
+        state = "gameover";
+      }
+
+      let path = findPath(h.x, h.y, h.col);
+      if (path) {
+        cars.push({
+          path,
+          step: 0,
+          speed: 0.05,
+          col: h.col,
+          drawX: h.x * cellSize + 15,
+          drawY: h.y * cellSize + 15
+        });
+        h.queue--;
+      }
+    }
+  }
+}
+
+function updateCars() {
+  for (let car of cars) {
+    if (car.step >= car.path.length) {
+      continue;
+    }
+
+    let target = car.path[car.step];
+
+    let tx = target.x * cellSize + 15;
+    let ty = target.y * cellSize + 15;
+
+    
+  }
+}
