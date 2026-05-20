@@ -1,11 +1,13 @@
 // Traffic Flow
 // Grayer Hardy
-// 2/27/2026
+// 4/16/2026
 //
 // Extra for Experts:
 // - used continue
 // - used {} for empty object
 // - used null
+// - used lerp
+// - used filter
 
 let cols = 20;
 let rows = 20;
@@ -343,6 +345,22 @@ function updateCars() {
     let tx = target.x * cellSize + 15;
     let ty = target.y * cellSize + 15;
 
-    
+    car.drawX = lerp(car.drawX, tx, car.speed);
+    car.drawY = lerp(car.drawY, ty, car.speed);
+
+    if (dist(car.drawX, car.drawY, tx, ty) < 1) {
+      car.step++;
+    }
   }
+
+  cars = cars.filter(car => {
+    if (car.step >= car.path.length) {
+      score++;
+      return false;
+    }
+    return true;
+  });
 }
+
+//----------------------PATHFINDING----------------------//
+
