@@ -160,6 +160,14 @@ function drawGrid() {
   }
 }
 
+function drawUI() {
+  fill(0);
+  textSize(16);
+  textAlign(LEFT, TOP);
+  text("Score: " + score, 10, 10);
+}
+
+
 //----------------------INPUT----------------------//
 
 function mousePressed() {
@@ -277,8 +285,9 @@ function isReachable(sx, sy, dx, dy) {
     let key = current.x + "," + current.y;
     if (visited[key]) {
       continue;
-      visited[key] = true;
     }
+    visited[key] = true;
+
     if (current.x === dx && current.y === dy) {
       return true;
     }
@@ -364,3 +373,50 @@ function updateCars() {
 
 //----------------------PATHFINDING----------------------//
 
+function findPath(sx, sy, col) {
+  let queue = [];
+  let visited = {};
+
+  queue.push({ x: sx, y: sy, path: [] });
+
+  while (queue.length > 0) {
+    let current = queue.shift();
+    let key = current.x + "," + current.y;
+
+    if (visited[key]) {
+      continue;
+    }
+    visited[key] = true;
+
+
+    let cell = grid[current.x][current.y];
+
+    if (cell.destination && cell.destination.toString() === col.toString()) {
+      return current.path;
+    }
+
+    let dirs = [
+      { x: 1, y: 0 },
+      { x: -1, y: 0 },
+      { x: 0, y: 1 },
+      { x: 0, y: -1 }
+    ];
+
+    for (let d of dirs) {
+      let nx = current.x + d.x;
+      let ny = current.y + d.y;
+
+      if (nx >= 0 && ny >= 0 && nx < cols && ny < rows) {
+        let next = grid[nx][ny];
+
+        if (next.road || next.destination) {
+          queue.push({
+            x: nx,
+            y: ny,
+            path: [...current.path, { x: nx, y: ny }]
+          });
+        }
+      }
+    }
+  }
+}
