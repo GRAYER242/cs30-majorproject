@@ -4,14 +4,14 @@
 //
 // Extra for Experts:
 // - used continue
-// - used {} for empty object
 // - used null
 // - used lerp
 // - used filter
+// - used BFS
+// - removed default right click function
+// - used manhattan principle
 
-let cols = 20;
-let rows = 20;
-let cellSize = 30;
+let cols, rows, cellSize;
 
 let grid = [];
 let cars = [];
@@ -225,6 +225,8 @@ function removeRoad() {
   }
 }
 
+document.oncontextmenu = () => false;
+
 //----------------------HOUSES----------------------//
 
 function createPairRandom() {
@@ -283,6 +285,7 @@ function isReachable(sx, sy, dx, dy) {
   while (queue.length > 0) {
     let current = queue.shift();
     let key = current.x + "," + current.y;
+    
     if (visited[key]) {
       continue;
     }
@@ -291,6 +294,7 @@ function isReachable(sx, sy, dx, dy) {
     if (current.x === dx && current.y === dy) {
       return true;
     }
+    
     let dirs = [
       { x: 1, y: 0 },
       { x: -1, y: 0 },
