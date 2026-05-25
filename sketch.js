@@ -124,7 +124,7 @@ function drawGameOver() {
   text("GAME OVER", width / 2, height / 2 - 20);
 
   textSize(20);
-  text("Score" + score, width / 2, height / 2 + 20);
+  text("Score " + score, width / 2, height / 2 + 20);
   text("Click to Restart", width / 2, height / 2 + 60);
 }
 
@@ -144,7 +144,7 @@ function drawGrid() {
 
       if (grid[i][j].house) {
         fill(grid[i][j].house);
-        rect(i * cellSize + 15, j * cellSize + 15, 18);
+        rect(i * cellSize + 15, j * cellSize + 15, 18, 18);
       }
 
       if (grid[i][j].destination) {
@@ -246,7 +246,7 @@ function createPairRandom() {
     let dx = floor(random(cols));
     let dy = floor(random(rows));
 
-    let houseCell = grid[hy][hx];
+    let houseCell = grid[hx][hy];
     let destCell = grid[dx][dy];
 
     let manhattan = abs(hx - dx) + abs(hy - dy);
