@@ -96,7 +96,8 @@ function updateGame() {
 
   if (globalTimer % spawnInterval === 0) {
     createPairRandom();
-    spawnInterval = max(minSpawnInterval, minSpawnInterval - 10);
+    spawnInterval = max(minSpawnInterval, spawnInterval - 30);
+    globalTimer = 0;
   }
   spawnCars();
   updateCars();
@@ -144,7 +145,7 @@ function drawGrid() {
 
       if (grid[i][j].house) {
         fill(grid[i][j].house);
-        rect(i * cellSize + 15, j * cellSize + 15, 18, 18);
+        rect(i * cellSize + 6, j * cellSize + 6, 15, 15);
       }
 
       if (grid[i][j].destination) {
