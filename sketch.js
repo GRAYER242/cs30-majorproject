@@ -10,6 +10,7 @@
 // - used BFS
 // - removed default right click function
 // - used manhattan principle
+// - used sound which I hadnt done in previous assignments
 
 let cols, rows, cellSize;
 
@@ -26,12 +27,22 @@ let minSpawnInterval = 240;
 
 let globalTimer = 0;
 
+let carSound;
+let pingSound;
+let isCarSoundPlaying = false;
+
 //----------------------SETUP----------------------//
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   updateGridSize();
   initGrid();
+
+  carSound = new Audio('car-running.mp3');
+  pingSound = new Audio('destination-ping.mp3');
+
+  carSound.loop = true;
+  carSound.volume = 1.0;
 }
 
 function updateGridSize() {
@@ -56,6 +67,8 @@ function initGrid() {
   score = 0;
   globalTimer = 0;
   spawnInterval = 600;
+
+  stopEngineAudio();
 
   for (let i = 0; i < cols; i++) {
     grid[i] = [];
@@ -286,7 +299,7 @@ function isReachable(sx, sy, dx, dy) {
   while (queue.length > 0) {
     let current = queue.shift();
     let key = current.x + "," + current.y;
-    
+
     if (visited[key]) {
       continue;
     }
@@ -295,7 +308,7 @@ function isReachable(sx, sy, dx, dy) {
     if (current.x === dx && current.y === dy) {
       return true;
     }
-    
+
     let dirs = [
       { x: 1, y: 0 },
       { x: -1, y: 0 },
@@ -330,6 +343,7 @@ function spawnCars() {
 
       if (h.queue > 6) {
         state = "gameover";
+        stopEngineAudio();
       }
 
       let path = findPath(h.x, h.y, h.col);
@@ -349,6 +363,13 @@ function spawnCars() {
 }
 
 function updateCars() {
+  if (cars.length > 0 && !isCarSoundPlaying) {
+    carSound.play().catch(e => console.log("User interaction required first"));
+    isCarSoundPlaying = true;
+  }
+  else if (cars.length === 0 && isCarSoundPlaying) {
+    stopEngineAudio();
+  }
   for (let car of cars) {
     if (car.step >= car.path.length) {
       continue;
@@ -370,10 +391,22 @@ function updateCars() {
   cars = cars.filter(car => {
     if (car.step >= car.path.length) {
       score++;
+      
+      let instance = pingSound.cloneNode();
+      instance.play();
+      
       return false;
     }
     return true;
   });
+}
+
+function stopEngineAudio() {
+  if (carSound) {
+    carSound.pause();
+    carSound.currentTime = 0;
+  }
+  isCarSoundPlaying = false;
 }
 
 //----------------------PATHFINDING----------------------//
