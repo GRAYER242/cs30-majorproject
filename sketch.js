@@ -31,6 +31,16 @@ let carSound;
 let pingSound;
 let isCarSoundPlaying = false;
 
+let grassImg;
+let roadImg;
+
+//----------------------PRELOAD----------------------//
+
+function preload() {
+  grassImg = loadImage('grass.jpg');
+  roadImg = loadImage('road.webp');
+}
+
 //----------------------SETUP----------------------//
 
 function setup() {
@@ -86,7 +96,7 @@ function initGrid() {
 //----------------------DRAW----------------------//
 
 function draw() {
-  background(240);
+  image(grassImg, 0, 0, width, height);
 
   if (state === "menu") {
     drawMenu();
@@ -147,13 +157,22 @@ function drawGameOver() {
 function drawGrid() {
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < rows; j++) {
-      stroke(200);
-      fill(255);
-      rect(i * cellSize, j * cellSize, cellSize, cellSize);
-
       if (grid[i][j].road) {
-        fill(80);
-        rect(i * cellSize, j * cellSize, cellSize, cellSize);
+        push(); 
+        
+        let centerX = i * cellSize + cellSize / 2;
+        let centerY = j * cellSize + cellSize / 2;
+        translate(centerX, centerY);
+
+        if (isHorizontalRoad(i, j)) {
+          rotate(HALF_PI);
+        }
+
+        imageMode(CENTER);
+        image(roadImg, 0, 0, cellSize, cellSize);
+        
+        pop();
+        imageMode(CORNER);
       }
 
       if (grid[i][j].house) {
@@ -172,6 +191,16 @@ function drawGrid() {
     fill(car.col);
     ellipse(car.drawX, car.drawY, 10);
   }
+}
+
+function isHorizontalRoad(i, j) {
+  if (i > 0 && grid[i - 1][j].road) {
+    return true;
+  }
+  if (i < cols - 1 && grid[i + 1][j].road) {
+    return true;
+  }
+  return false;
 }
 
 function drawUI() {
@@ -391,10 +420,10 @@ function updateCars() {
   cars = cars.filter(car => {
     if (car.step >= car.path.length) {
       score++;
-      
+
       let instance = pingSound.cloneNode();
       instance.play();
-      
+
       return false;
     }
     return true;
