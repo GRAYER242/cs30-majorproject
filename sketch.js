@@ -12,7 +12,9 @@
 // - used manhattan principle
 // - used sound which I hadnt done in previous assignments
 
-let cols, rows, cellSize;
+let cols;
+let rows;
+let cellSize;
 
 let grid = [];
 let cars = [];
@@ -23,7 +25,7 @@ let state = "menu";
 let score = 0;
 
 let spawnInterval = 600;
-let minSpawnInterval = 240;
+let minSpawnInterval = 300;
 
 let globalTimer = 0;
 
@@ -205,7 +207,7 @@ function isHorizontalRoad(i, j) {
 
 function drawUI() {
   fill(0);
-  textSize(16);
+  textSize(25);
   textAlign(LEFT, TOP);
   text("Score: " + score, 10, 10);
 }
