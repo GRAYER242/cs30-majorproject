@@ -12,6 +12,9 @@
 // - used manhattan principle
 // - used sound which I hadnt done in previous assignments
 
+//----------------------GLOBAL VARIABLES----------------------//
+
+// grid variables
 let cols;
 let rows;
 let cellSize;
@@ -21,18 +24,23 @@ let cars = [];
 let houses = [];
 let destinations = [];
 
+// state variables
 let state = "menu";
 let score = 0;
 
+// car spawning
 let spawnInterval = 600;
 let minSpawnInterval = 300;
 
+// timer
 let globalTimer = 0;
 
+// sounds
 let carSound;
 let pingSound;
 let isCarSoundPlaying = false;
 
+// images
 let grassImg;
 let roadImg;
 
@@ -49,11 +57,13 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   updateGridSize();
   initGrid();
-
+  
+  // new variable for audio
   carSound = new Audio('car-running.mp3');
   pingSound = new Audio('destination-ping.mp3');
 
   carSound.loop = true;
+  // increasing volume
   carSound.volume = 1.0;
 }
 
@@ -92,6 +102,7 @@ function initGrid() {
       };
     }
   }
+  // spawn pair (house and destination) in grid
   createPairRandom();
 }
 
@@ -119,6 +130,7 @@ function draw() {
 function updateGame() {
   globalTimer++;
 
+  // initiating how often cars spawn
   if (globalTimer % spawnInterval === 0) {
     createPairRandom();
     spawnInterval = max(minSpawnInterval, spawnInterval - 30);
