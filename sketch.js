@@ -11,41 +11,44 @@
 // - removed default right click function
 // - used manhattan principle
 // - used sound which I hadnt done in previous assignments
+// - made it so roads rotate depending on what they are attatched to
 
 //----------------------GLOBAL VARIABLES----------------------//
 
-// grid variables
+// Grid setup
 let cols;
 let rows;
 let cellSize;
 
+// Game objects
 let grid = [];
 let cars = [];
 let houses = [];
 let destinations = [];
 
-// state variables
+// State and score
 let state = "menu";
 let score = 0;
 
-// car spawning
+// Car spawning difficulty
 let spawnInterval = 600;
 let minSpawnInterval = 300;
 
-// timer
+// Timer
 let globalTimer = 0;
 
-// sounds
+// Sounds / audio
 let carSound;
 let pingSound;
 let isCarSoundPlaying = false;
 
-// images
+// Images / textures
 let grassImg;
 let roadImg;
 
 //----------------------PRELOAD----------------------//
 
+// Load media files before game starts
 function preload() {
   grassImg = loadImage('grass.jpg');
   roadImg = loadImage('road.webp');
@@ -57,22 +60,24 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
   updateGridSize();
   initGrid();
-  
-  // new variable for audio
+
+  // Sound setup
   carSound = new Audio('car-running.mp3');
   pingSound = new Audio('destination-ping.mp3');
 
   carSound.loop = true;
-  // increasing volume
+  // Increasing volume
   carSound.volume = 1.0;
 }
 
+// Calculate rows / cols based on screen size
 function updateGridSize() {
   cellSize = 30;
   cols = floor(windowWidth / cellSize);
   rows = floor(windowHeight / cellSize);
 }
 
+// Handle screen resizing
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
   updateGridSize();
@@ -81,6 +86,7 @@ function windowResized() {
 
 //----------------------INIT----------------------//
 
+// Reset all in game data to baseline values
 function initGrid() {
   grid = [];
   cars = [];
@@ -92,6 +98,7 @@ function initGrid() {
 
   stopEngineAudio();
 
+  // Create empty 2D grid tracking roads, houses, and goals
   for (let i = 0; i < cols; i++) {
     grid[i] = [];
     for (let j = 0; j < rows; j++) {
@@ -102,7 +109,7 @@ function initGrid() {
       };
     }
   }
-  // spawn pair (house and destination) in grid
+  // Spawn pair (house and destination) in grid
   createPairRandom();
 }
 
@@ -111,6 +118,7 @@ function initGrid() {
 function draw() {
   image(grassImg, 0, 0, width, height);
 
+  // Screen routing based on game state
   if (state === "menu") {
     drawMenu();
   }
@@ -127,10 +135,11 @@ function draw() {
 
 //----------------------GAMELOOP----------------------//
 
+// Physics, timers, and car mechanics updates
 function updateGame() {
   globalTimer++;
 
-  // initiating how often cars spawn
+  // Handle periodic pair spawning and difficulty scaling
   if (globalTimer % spawnInterval === 0) {
     createPairRandom();
     spawnInterval = max(minSpawnInterval, spawnInterval - 30);
@@ -142,6 +151,7 @@ function updateGame() {
 
 //----------------------MENU----------------------//
 
+// Render start screen
 function drawMenu() {
   textAlign(CENTER, CENTER);
   textSize(40);
@@ -152,6 +162,7 @@ function drawMenu() {
   text("Click to Start", width / 2, height / 2 + 20);
 }
 
+// Render game over overlay
 function drawGameOver() {
   fill(0, 150);
   rect(0, 0, width, height);
@@ -168,12 +179,13 @@ function drawGameOver() {
 
 //----------------------GRID----------------------//
 
+// Draw all visual layers (roads, buildings, targets, cars)
 function drawGrid() {
   for (let i = 0; i < cols; i++) {
     for (let j = 0; j < rows; j++) {
       if (grid[i][j].road) {
-        push(); 
-        
+        push();
+
         let centerX = i * cellSize + cellSize / 2;
         let centerY = j * cellSize + cellSize / 2;
         translate(centerX, centerY);
@@ -184,11 +196,12 @@ function drawGrid() {
 
         imageMode(CENTER);
         image(roadImg, 0, 0, cellSize, cellSize);
-        
+
         pop();
         imageMode(CORNER);
       }
 
+      // Draw houses
       if (grid[i][j].house) {
         fill(grid[i][j].house);
         rect(i * cellSize + 6, j * cellSize + 6, 15, 15);
@@ -201,12 +214,14 @@ function drawGrid() {
     }
   }
 
+  // Draw moving cars
   for (let car of cars) {
     fill(car.col);
     ellipse(car.drawX, car.drawY, 10);
   }
 }
 
+// Check adjacent tiles to orient road sprites correctly
 function isHorizontalRoad(i, j) {
   if (i > 0 && grid[i - 1][j].road) {
     return true;
@@ -217,6 +232,7 @@ function isHorizontalRoad(i, j) {
   return false;
 }
 
+// Render the scores overlay
 function drawUI() {
   fill(0);
   textSize(25);
@@ -227,6 +243,7 @@ function drawUI() {
 
 //----------------------INPUT----------------------//
 
+// Click detection for menus and drawing
 function mousePressed() {
   if (state === "menu") {
     state = "playing";
@@ -247,6 +264,7 @@ function mousePressed() {
   }
 }
 
+// Continuous road editing when holding down mouse
 function mouseDragged() {
   if (state !== "playing") {
     return;
@@ -260,6 +278,7 @@ function mouseDragged() {
   }
 }
 
+// Place a road tile under the cursor
 function placeRoad() {
   let i = floor(mouseX / cellSize);
   let j = floor(mouseY / cellSize);
@@ -271,6 +290,7 @@ function placeRoad() {
   }
 }
 
+// Erase a road tile under the cursor
 function removeRoad() {
   let i = floor(mouseX / cellSize);
   let j = floor(mouseY / cellSize);
@@ -282,10 +302,12 @@ function removeRoad() {
   }
 }
 
+// Block the default browser context menu on right-click
 document.oncontextmenu = () => false;
 
 //----------------------HOUSES----------------------//
 
+// Select and position a new matching pair on clear grid space
 function createPairRandom() {
   let colors = [
     color(255, 0, 0),
@@ -297,6 +319,7 @@ function createPairRandom() {
   let col = random(colors);
   let attempts = 0;
 
+  // Attempt loops to secure a valid, unblocked placement zone
   while (attempts < 250) {
     let hx = floor(random(cols));
     let hy = floor(random(rows));
@@ -309,6 +332,7 @@ function createPairRandom() {
     let manhattan = abs(hx - dx) + abs(hy - dy);
     let tooClose = manhattan < 5;
 
+    // Check if space is completely empty
     let valid = !tooClose && !houseCell.house && !houseCell.destination && !houseCell.road && !destCell.house && !destCell.destination && !destCell.road;
 
     if (!valid) {
@@ -316,11 +340,13 @@ function createPairRandom() {
       continue;
     }
 
+    // Verify a route is actually possible before placing
     if (!isReachable(hx, hy, dx, dy)) {
       attempts++;
       continue;
     }
 
+    // Save pair data
     houseCell.house = col;
     houses.push({ x: hx, y: hy, col, timer: 0, queue: 0 });
 
@@ -333,6 +359,7 @@ function createPairRandom() {
 
 //----------------------REACHABILITY----------------------//
 
+// Breadth-First Search (BFS) routing algorithm to verify path feasibility
 function isReachable(sx, sy, dx, dy) {
   let queue = [];
   let visited = {};
@@ -376,6 +403,7 @@ function isReachable(sx, sy, dx, dy) {
 
 //----------------------CARS----------------------//
 
+// Manage house spawners and trigger loss if backlog is too high
 function spawnCars() {
   for (let h of houses) {
     h.timer++;
@@ -384,11 +412,13 @@ function spawnCars() {
       h.timer = 0;
       h.queue++;
 
+      // Lose condition (more than 6 cars waiting)
       if (h.queue > 6) {
         state = "gameover";
         stopEngineAudio();
       }
 
+      // Try to find a player-built path to deploy car
       let path = findPath(h.x, h.y, h.col);
       if (path) {
         cars.push({
@@ -405,6 +435,7 @@ function spawnCars() {
   }
 }
 
+// Update runtime loops and engine sound settings
 function updateCars() {
   if (cars.length > 0 && !isCarSoundPlaying) {
     carSound.play().catch(e => console.log("User interaction required first"));
@@ -431,6 +462,7 @@ function updateCars() {
     }
   }
 
+  // Filter out cars that successfully arrived at their destinations
   cars = cars.filter(car => {
     if (car.step >= car.path.length) {
       score++;
@@ -444,6 +476,7 @@ function updateCars() {
   });
 }
 
+// Halts motor sound streams safely and resets state trackers
 function stopEngineAudio() {
   if (carSound) {
     carSound.pause();
@@ -454,6 +487,7 @@ function stopEngineAudio() {
 
 //----------------------PATHFINDING----------------------//
 
+// Breadth-First Search (BFS) pathfinding engine to route cars over placed roads
 function findPath(sx, sy, col) {
   let queue = [];
   let visited = {};
