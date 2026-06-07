@@ -30,6 +30,13 @@ let destinations = [];
 // State and score
 let state = "menu";
 let score = 0;
+let highScore = 0;
+
+// Pause
+let paused = false;
+
+// Audio toggle
+let soundEnabled = true;
 
 // Car spawning difficulty
 let spawnInterval = 600;
@@ -46,6 +53,9 @@ let isCarSoundPlaying = false;
 // Images / textures
 let grassImg;
 let roadImg;
+
+// Menu timer
+let gameStartFrame = 0;
 
 //----------------------PRELOAD----------------------//
 
@@ -96,6 +106,9 @@ function initGrid() {
   score = 0;
   globalTimer = 0;
   spawnInterval = 600;
+  paused = false;
+  score = 0;
+  gameStartFrame = frameCount;
 
   stopEngineAudio();
 
@@ -123,6 +136,9 @@ function draw() {
   if (state === "menu") {
     drawMenu();
   }
+  else if (state === "instructions") {
+    drawInstructions();
+  }
   else if (state === "playing") {
     updateGame();
     drawGrid();
@@ -138,14 +154,19 @@ function draw() {
 
 // Physics, timers, and car mechanics updates
 function updateGame() {
+
+  if (paused) {
+    return;
+  }
+
   globalTimer++;
 
-  // Handle periodic pair spawning and difficulty scaling
   if (globalTimer % spawnInterval === 0) {
     createPairRandom();
     spawnInterval = max(minSpawnInterval, spawnInterval - 30);
     globalTimer = 0;
   }
+
   spawnCars();
   updateCars();
 }
@@ -161,6 +182,40 @@ function drawMenu() {
 
   textSize(20);
   text("Click to Start", width / 2, height / 2 + 20);
+
+  textSize(16);
+  text("Press I for Instructions", width / 2, height / 2 + 40);
+}
+
+// Instructions / controls
+function drawInstructions() {
+  fill(0);
+  textAlign(CENTER, CENTER);
+
+  textSize(32);
+  text("Instructions", width / 2, 120);
+
+  textSize(18);
+
+  text(
+    "OBJECTIVE\n" +
+    "Build roads connecting coloured houses\n" +
+    "to their matching coloured destinations.\n\n" +
+
+    "CONTROLS\n" +
+    "Left Click: Place Road\n" +
+    "Right Click: Remove Road\n" +
+    "Click + Drag: Draw Continuously\n" +
+    "Press P to Pause Throughout the Game\n" +
+    "Press M to Mute Sounds\n\n" +
+
+    "Cars deliver automatically when a path exists.\n" +
+    "Keep house queues below 7 cars.\n\n" +
+
+    "Press ESC to return to menu.",
+    width / 2,
+    height / 2
+  );
 }
 
 // Render game over overlay
@@ -204,8 +259,30 @@ function drawGrid() {
 
       // Draw houses
       if (grid[i][j].house) {
+
+        let houseData = houses.find(h => h.x === i && h.y === j);
+
+        if (houseData && houseData.queue >= 5) {
+          stroke(255, 0, 0);
+          strokeWeight(3);
+        }
+        else {
+          stroke(0);
+          strokeWeight(1);
+        }
+
         fill(grid[i][j].house);
+
         rect(i * cellSize + 6, j * cellSize + 6, 15, 15);
+
+        noStroke();
+
+        if (houseData) {
+          fill(255);
+          textSize(12);
+          textAlign(CENTER, CENTER);
+          text(houseData.queue, i * cellSize + 14, j * cellSize + 14);
+        }
       }
 
       if (grid[i][j].destination) {
@@ -233,12 +310,30 @@ function isHorizontalRoad(i, j) {
   return false;
 }
 
-// Render the scores overlay
+// Render the scores and timer overlay
 function drawUI() {
+
   fill(0);
+
   textSize(25);
   textAlign(LEFT, TOP);
+
   text("Score: " + score, 10, 10);
+  text("High Score: " + highScore, 10, 40);
+
+  let survivalSeconds =
+    floor((frameCount - gameStartFrame) / 60);
+
+  text("Time: " + survivalSeconds + "s", 10, 70);
+
+  if (paused) {
+    fill(255, 0, 0);
+
+    textSize(40);
+    textAlign(CENTER, CENTER);
+
+    text("PAUSED", width / 2, height / 2);
+  }
 }
 
 
@@ -262,6 +357,34 @@ function mousePressed() {
   }
   else if (mouseButton === RIGHT) {
     removeRoad();
+  }
+}
+
+// Click certain keys to access instructions, pause, and mute sounds
+function keyPressed() {
+
+  if (state === "menu" && (key === "i" || key === "I")) {
+    state = "instructions";
+  }
+
+  if (state === "instructions" && keyCode === ESCAPE) {
+    state = "menu";
+  }
+
+  if (state === "playing") {
+
+    if (key === "p" || key === "P") {
+      paused = !paused;
+    }
+
+    if (key === "m" || key === "M") {
+
+      soundEnabled = !soundEnabled;
+
+      if (!soundEnabled) {
+        stopEngineAudio();
+      }
+    }
   }
 }
 
@@ -313,7 +436,7 @@ function createPairRandom() {
   let colors = [
     color(255, 0, 0),
     color(0, 0, 255),
-    color(0, 200, 0),
+    color(180, 0, 255),
     color(255, 150, 0),
   ];
 
@@ -415,6 +538,9 @@ function spawnCars() {
 
       // Lose condition (more than 6 cars waiting)
       if (h.queue > 6) {
+
+        highScore = max(highScore, score);
+
         state = "gameover";
         stopEngineAudio();
       }
@@ -438,7 +564,7 @@ function spawnCars() {
 
 // Update runtime loops and engine sound settings
 function updateCars() {
-  if (cars.length > 0 && !isCarSoundPlaying) {
+  if (soundEnabled && cars.length > 0 && !isCarSoundPlaying) {
     carSound.play().catch(e => console.log("User interaction required first"));
     isCarSoundPlaying = true;
   }
@@ -468,8 +594,10 @@ function updateCars() {
     if (car.step >= car.path.length) {
       score++;
 
+    if (soundEnabled) {
       let instance = pingSound.cloneNode();
       instance.play();
+    }
 
       return false;
     }
@@ -482,6 +610,8 @@ function stopEngineAudio() {
   if (carSound) {
     carSound.pause();
     carSound.currentTime = 0;
+    carSound.src = "";
+    carSound.load();
   }
   isCarSoundPlaying = false;
 }

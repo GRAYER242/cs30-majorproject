@@ -3,37 +3,46 @@ CS30 Major Project Beta Testing
 
 Experienced Coder:
 
-What they Liked:
-- Separation of Search Responsibilities: Splitting algorithmic concerns into a macro-check (isReachable for map spawns) and a micro-check (findPath for roads) is an excellent structural design pattern.
+What they liked:
+- Solid grid-based structure with clear separation of systems
+- BFS pathfinding is implemented correctly
+- Game state system (menu / instructions / playing / gameover) is clean and readable
+- Car movement uses smooth interpolation, not rigid grid stepping
+- Difficulty scaling via spawn interval creates steady pressure
+- Road placement system is simple and easy to extend
+- Update/render loop is separated clearly
+- Instructions screen improves onboarding
 
-- Array State Tracking: Storing unique properties (road, house, destination)  inside a clean 2D array grid object maps makes spatial queries very effective.
-
-- Vector Interpolation: Using linear interpolation (lerp) with array destination filtering gives the car movement a smooth feel.
-
-- JavaScript Audio: Scaling dynamic soundscapes directly using .cloneNode() duplication shows a good understanding of browser memory allocation.
-
-What to Improve:
-- Loop String Conversions: Using .toString() on p5.js color elements inside nested while loops triggers garbage collection spikes and will lag under heavy traffic.
-
-- Array-Spreading Performance Drops: Recreating arrays via [...current.path] inside every single BFS step forces continuous memory reallocation; tracking steps using linked index parents would be faster.
-
-- Destructive Resize Events: Resetting the map entirely inside windowResized() wipes active score parameters and map arrays, which frustrates players who change window scales mid-game.
+What to improve:
+- No visibility of house queue pressure → players can’t prioritize problems
+- No high score system → weak replay incentive
+- No survival timer → no sense of run length or progression
+- No pause system → difficult to plan during busy moments
+- No sound toggle → limited user control over audio
+- No clear warning system for failing houses → loss feels abrupt
+- UI doesn’t strongly communicate urgency or priorities
+- House lookup uses repeated array searches (minor inefficiency)
 
 
 Inexperienced Coder:
 
-What they Liked:
-- Click and Drag: Combining mousePressed() and mouseDragged() filters into straightforward grid position calculations makes the click-to-draw path controls incredibly responsive.
+What they liked:
+- Easy to start and understand (click → play immediately)
+- Building roads feels responsive and interactive
+- Cars moving automatically makes the world feel alive
+- Colors help distinguish houses and destinations
+- Instructions screen makes controls understandable
+- Click-and-drag road building feels smooth
+- Game naturally becomes more challenging over time
+- Score gives a simple sense of progress
 
-- Clear Win/Loss: The boundaries (h.queue > 6 triggering an instant menu state override) offer a simple example of state machines.
-
-- Coordinate Mapping: Multiplying simple grid index positions directly against fixed pixel metrics (cellSize + 15) makes it easy to understand coordinate translation math.
-
-- Right-Click Override: Using browser block hooks like document.oncontextmenu = () => false is a clever way to handle custom user inputs without third-party libraries.
-
-What to Improve:
-- Queue Variables: The game does not visually show how close a house is to its 6-car limit, leaving players confused as to why they suddenly hit an unexpected game-over screen.
-
-- Incomplete Target Path: Cars disappear instantly at the edge of destinations rather than driving directly into the middle of the tiles, creating a slightly choppy visual transition.
-
-- Fallback for Images: If local audio streams or external images (grass.jpg) fail to load over slow connections, the script crashes completely instead of executing vector fallbacks.
+What to improve:
+- Hard to see which houses are close to failing
+- No way to tell how long a run has lasted
+- No pause option to think during complex situations
+- No sound controls
+- No clear priority indicators for urgent houses
+- Limited long-term motivation beyond score
+- Feedback for success/failure is too minimal
+- Instructions help, but in-game guidance is still limited
+- Game can feel stressful because problems appear without warning
