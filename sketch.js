@@ -594,10 +594,10 @@ function updateCars() {
     if (car.step >= car.path.length) {
       score++;
 
-    if (soundEnabled) {
-      let instance = pingSound.cloneNode();
-      instance.play();
-    }
+      if (soundEnabled) {
+        let instance = pingSound.cloneNode();
+        instance.play();
+      }
 
       return false;
     }
